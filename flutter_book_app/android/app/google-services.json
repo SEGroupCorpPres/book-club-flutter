@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "201987809551",
+    "project_id": "book-club-flutter-a6d4f",
+    "storage_bucket": "book-club-flutter-a6d4f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201987809551:android:dd4502571dc69f1e755e7a",
+        "android_client_info": {
+          "package_name": "uz.futuretechnologiesinc.segroupllc.presidentftinc.flutter_book_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "201987809551-qpurfk89ij4l08l85vhni2a7qf7n5ulg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZ-N0C3iH3-bAoIwdjIeI05NU6SQ9DCuE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "201987809551-qpurfk89ij4l08l85vhni2a7qf7n5ulg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
