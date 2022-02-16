@@ -7,6 +7,11 @@ import 'package:flutter_icons/flutter_icons.dart';
 import '../../../states/current_user.dart';
 import '../../signup/signup.dart';
 
+enum LoginType {
+  email,
+  google,
+}
+
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
 
@@ -16,14 +21,27 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   void _login({
-    required String email,
-    required String password,
+    required LoginType type,
+    String? email,
+    String? password,
     required BuildContext context,
   }) async {
     CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
     try {
-      String _returnMessage = await _currentUser.signUpWithEmailAndPassword(
-          email: email, password: password);
+      String? _returnMessage;
+      switch (type) {
+        case LoginType.email:
+          _returnMessage = await _currentUser.signUpWithEmailAndPassword(
+            email: email!,
+            password: password!,
+          );
+          break;
+        case LoginType.google:
+          _returnMessage = await _currentUser.signInWithGoogle();
+          break;
+        default:
+      }
+
       if (_returnMessage == 'success') {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -34,7 +52,7 @@ class _LoginFormState extends State<LoginForm> {
         // ignore: deprecated_member_use
         Scaffold.of(context).showSnackBar(
           SnackBar(
-            content: Text(_returnMessage),
+            content: Text(_returnMessage!),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -46,8 +64,11 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Widget _googleButton() {
+    // ignore: deprecated_member_use
     return OutlineButton(
-      onPressed: () {},
+      onPressed: () {
+        _login(type: LoginType.google, context: context);
+      },
       splashColor: Colors.grey,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
       highlightElevation: 0,
@@ -117,6 +138,7 @@ class _LoginFormState extends State<LoginForm> {
           RaisedButton(
             onPressed: () {
               _login(
+                type: LoginType.email,
                 email: _emailNameTextEditingController.text,
                 password: _passwordNameTextEditingController.text,
                 context: context,
@@ -144,6 +166,7 @@ class _LoginFormState extends State<LoginForm> {
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             child: const Text('Don\'t have any account? Sign Up here'),
           ),
+          _googleButton(),
         ],
       ),
     );

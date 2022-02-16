@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:twitter_login/entity/auth_result.dart';
 
 class CurrentUser extends ChangeNotifier {
   late String _uid;
@@ -26,7 +28,30 @@ class CurrentUser extends ChangeNotifier {
   }
 
   Future<String> signInWithGoogle() async {
-    return 'error';
+    String retVal = 'error';
+    GoogleSignIn _googleSignIn = GoogleSignIn(
+      scopes: [
+        'email',
+        'https://www.googleapis.com/auth/contacts.readonly',
+      ],
+    );
+    try {
+      GoogleSignInAccount? _googleSignInAccount = await _googleSignIn.signIn();
+      GoogleSignInAuthentication? _googleSignInAuthentication =
+          await _googleSignInAccount!.authentication;
+      final AuthCredential _authCredential = GoogleAuthProvider.credential(
+        idToken: _googleSignInAuthentication.idToken,
+        accessToken: _googleSignInAuthentication.accessToken,
+      );
+      UserCredential _userCredential =
+          await _firebaseAuth.signInWithCredential(_authCredential);
+      _uid = _userCredential.user!.uid;
+      _email = _userCredential.user!.email!;
+      retVal = 'success';
+    } catch (e) {
+      retVal = e.toString();
+    }
+    return retVal;
   }
 
   Future<String> signInWithFacebook() async {
