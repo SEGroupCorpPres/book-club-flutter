@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_book_app/screens/home.dart';
 import 'package:flutter_book_app/widgets/container.dart';
 import 'package:provider/provider.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flutter_icons/flutter_icons.dart';
 
 import '../../../states/current_user.dart';
@@ -31,7 +32,7 @@ class _LoginFormState extends State<LoginForm> {
       String? _returnMessage;
       switch (type) {
         case LoginType.email:
-          _returnMessage = await _currentUser.signUpWithEmailAndPassword(
+          _returnMessage = await _currentUser.loginWithEmailAndPassword(
             email: email!,
             password: password!,
           );
@@ -43,11 +44,10 @@ class _LoginFormState extends State<LoginForm> {
       }
 
       if (_returnMessage == 'success') {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
-        );
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (route) => false);
       } else {
         // ignore: deprecated_member_use
         Scaffold.of(context).showSnackBar(
@@ -79,7 +79,7 @@ class _LoginFormState extends State<LoginForm> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: const <Widget>[
-            Icon(FontAwesome.google),
+            Icon(AntDesign.google),
             Padding(
               padding: EdgeInsets.only(left: 10),
               child: Text(

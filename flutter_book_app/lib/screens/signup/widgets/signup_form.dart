@@ -22,12 +22,16 @@ class _SignUpFormState extends State<SignUpForm> {
   void _signUp({
     required String email,
     required String password,
+    required String fullName,
     required BuildContext context,
   }) async {
     CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
     try {
       String _returnMessage = await _currentUser.signUpWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+        fullName: fullName,
+      );
       if (_returnMessage == 'success') {
         Navigator.pop(context);
       } else {
@@ -104,6 +108,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 _signUp(
                   email: _emailNameTextEditingController.text,
                   password: _passwordNameTextEditingController.text,
+                  fullName: _fullNameTextEditingController.text,
                   context: context,
                 );
               } else {

@@ -1,18 +1,53 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../models/user.dart' as model;
 import 'package:google_sign_in/google_sign_in.dart';
+import '../services/database.dart' as services;
+// ignore: unused_import
 import 'package:twitter_login/entity/auth_result.dart';
 
 class CurrentUser extends ChangeNotifier {
-  late String _uid;
-  late String _email;
+  late model.User? _user;
 
-  String get getUid => _uid;
-  String get getEmail => _email;
+  model.User get getUser => _user!;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  Future<String> signUpWithEmailAndPassword(
-      {required String email, required String password}) async {
+  Future<String> onStartUp() async {
     String retVal = 'error';
+    try {
+      User _firebaseUser = _firebaseAuth.currentUser!;
+      if (_firebaseUser != null) {
+        _user = await services.DataBase().getUser(_firebaseUser.uid);
+        if (_user != null) {
+          retVal = 'success';
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+    return retVal;
+  }
+
+  Future<String> signOut() async {
+    String retVal = 'error';
+    try {
+      await _firebaseAuth.signOut();
+      _user = model.User();
+      retVal = 'success';
+    } catch (e) {
+      print(e);
+    }
+    return retVal;
+  }
+
+  Future<String> signUpWithEmailAndPassword({
+    required String email,
+    required String password,
+    required String fullName,
+  }) async {
+    String retVal = 'error';
+    model.User _user = model.User();
     try {
       // ignore: unused_local_variable
       UserCredential _userCredential =
@@ -20,7 +55,13 @@ class CurrentUser extends ChangeNotifier {
         email: email,
         password: password,
       );
-      retVal = 'success';
+      _user.uid = _userCredential.user!.uid;
+      _user.email = _userCredential.user!.email;
+      _user.fullName = fullName;
+      String _returnMessage = await services.DataBase().createUser(_user);
+      if (_returnMessage == 'success') {
+        retVal = 'success';
+      }
     } catch (e) {
       retVal = e.toString();
     }
@@ -35,6 +76,7 @@ class CurrentUser extends ChangeNotifier {
         'https://www.googleapis.com/auth/contacts.readonly',
       ],
     );
+    model.User? _newUser = model.User();
     try {
       GoogleSignInAccount? _googleSignInAccount = await _googleSignIn.signIn();
       GoogleSignInAuthentication? _googleSignInAuthentication =
@@ -45,11 +87,20 @@ class CurrentUser extends ChangeNotifier {
       );
       UserCredential _userCredential =
           await _firebaseAuth.signInWithCredential(_authCredential);
-      _uid = _userCredential.user!.uid;
-      _email = _userCredential.user!.email!;
-      retVal = 'success';
-    } catch (e) {
+      if (_userCredential.additionalUserInfo!.isNewUser) {
+        _newUser.uid = _userCredential.user!.uid;
+        _newUser.email = _userCredential.user!.email!;
+        _newUser.fullName = _userCredential.user!.displayName;
+        services.DataBase().createUser(_newUser);
+      }
+      _user = await services.DataBase().getUser(_userCredential.user!.uid);
+      if (_user != null) {
+        retVal = 'success';
+      }
+    } on ProcessException catch (e) {
       retVal = e.toString();
+    } catch (e) {
+      print(e);
     }
     return retVal;
   }
@@ -83,11 +134,14 @@ class CurrentUser extends ChangeNotifier {
         email: email,
         password: password,
       );
-      _uid = _userCredential.user!.uid;
-      _email = _userCredential.user!.email!;
-      retVal = 'success';
-    } catch (e) {
+      _user = await services.DataBase().getUser(_userCredential.user!.uid);
+      if (_user != null) {
+        retVal = 'success';
+      }
+    } on ProcessException catch (e) {
       retVal = e.toString();
+    } catch (e) {
+      print(e);
     }
     return retVal;
   }
