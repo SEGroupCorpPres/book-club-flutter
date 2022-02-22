@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_book_app/screens/home.dart';
+import 'package:flutter_book_app/screens/root.dart';
 import 'package:flutter_book_app/widgets/container.dart';
 import 'package:provider/provider.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -45,9 +46,12 @@ class _LoginFormState extends State<LoginForm> {
 
       if (_returnMessage == 'success') {
         Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (route) => false);
+          context,
+          MaterialPageRoute(
+            builder: (context) => const Root(),
+          ),
+          (route) => false,
+        );
       } else {
         // ignore: deprecated_member_use
         Scaffold.of(context).showSnackBar(

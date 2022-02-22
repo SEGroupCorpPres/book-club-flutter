@@ -17,13 +17,12 @@ class CurrentUser extends ChangeNotifier {
     String retVal = 'error';
     try {
       User _firebaseUser = _firebaseAuth.currentUser!;
-      if (_firebaseUser != null) {
-        _user = await services.DataBase().getUser(_firebaseUser.uid);
-        if (_user != null) {
-          retVal = 'success';
-        }
+      _user = await services.DataBase().getUser(_firebaseUser.uid);
+      if (_user != null) {
+        retVal = 'success';
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
     return retVal;
@@ -36,6 +35,7 @@ class CurrentUser extends ChangeNotifier {
       _user = model.User();
       retVal = 'success';
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
     return retVal;
@@ -100,6 +100,7 @@ class CurrentUser extends ChangeNotifier {
     } on ProcessException catch (e) {
       retVal = e.toString();
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
     return retVal;
@@ -141,6 +142,7 @@ class CurrentUser extends ChangeNotifier {
     } on ProcessException catch (e) {
       retVal = e.toString();
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
     return retVal;

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_book_app/screens/login/login.dart';
+import 'package:flutter_book_app/screens/no_group.dart';
 import 'package:provider/provider.dart';
 
-import '../../states/current_user.dart';
-import '../home.dart';
+import '../states/current_group.dart';
+import '../states/current_user.dart';
+import 'home.dart';
+import 'splash.dart';
 
 enum AuthStatus {
+  unknown,
   notLoggedIn,
-  loggedIn,
+  notInGroup,
+  inGroup,
 }
 
 class Root extends StatefulWidget {
@@ -18,7 +23,7 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
-  late AuthStatus _authStatus = AuthStatus.notLoggedIn;
+  late AuthStatus _authStatus = AuthStatus.unknown;
   @override
   void didChangeDependencies() async {
     // ignore: todo
@@ -27,8 +32,18 @@ class _RootState extends State<Root> {
     CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
     String _returnMessage = await _currentUser.onStartUp();
     if (_returnMessage == 'success') {
+      if (_currentUser.getUser.groupId != null) {
+        setState(() {
+          _authStatus = AuthStatus.inGroup;
+        });
+      } else {
+        setState(() {
+          _authStatus = AuthStatus.notInGroup;
+        });
+      }
+    } else {
       setState(() {
-        _authStatus = AuthStatus.loggedIn;
+        _authStatus = AuthStatus.notLoggedIn;
       });
     }
   }
@@ -42,8 +57,21 @@ class _RootState extends State<Root> {
         // ignore: todo
         // TODO: Handle this case.
         break;
-      case AuthStatus.loggedIn:
-        retVal = const HomeScreen();
+      case AuthStatus.inGroup:
+        retVal = ChangeNotifierProvider(
+          create: (BuildContext context) => CurrentGroup(),
+          child: const HomeScreen(),
+        );
+        // ignore: todo
+        // TODO: Handle this case.
+        break;
+      case AuthStatus.unknown:
+        retVal = const SplashScreen();
+        // ignore: todo
+        // TODO: Handle this case.
+        break;
+      case AuthStatus.notInGroup:
+        retVal = const NoGroup();
         // ignore: todo
         // TODO: Handle this case.
         break;
